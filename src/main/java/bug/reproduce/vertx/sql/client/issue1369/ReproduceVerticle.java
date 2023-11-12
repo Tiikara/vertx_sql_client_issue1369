@@ -32,18 +32,18 @@ public class ReproduceVerticle extends AbstractVerticle {
                         sqlConnection
                                 .begin()
                                 .compose(transaction -> {
-                                    System.out.println("query(\"SAVEPOINT AsyncSqlConnectionPgSavepointWithErrorHandling\"): START");
-                                    return sqlConnection.query("SAVEPOINT AsyncSqlConnectionPgSavepointWithErrorHandling")
+                                    System.out.println("query(\"INSERT INTO users (name) VALUES ('test')\"): START");
+                                    return sqlConnection
+                                            .query("INSERT INTO users (name) VALUES ('test')")
                                             .execute()
-                                            .compose(res -> {
-                                                System.out.println("query(\"SAVEPOINT AsyncSqlConnectionPgSavepointWithErrorHandling\"): SUCCESS");
+                                            .compose(res2 -> {
+                                                System.out.println("query(\"INSERT INTO users (name) VALUES ('test')\"): SUCCESS");
 
-                                                System.out.println("query(\"INSERT INTO users (name) VALUES ('test')\"): START");
-                                                return sqlConnection
-                                                        .query("INSERT INTO users (name) VALUES ('test')")
+                                                System.out.println("query(\"SAVEPOINT AsyncSqlConnectionPgSavepointWithErrorHandling\"): START");
+                                                return sqlConnection.query("SAVEPOINT AsyncSqlConnectionPgSavepointWithErrorHandling")
                                                         .execute()
-                                                        .compose(res2 -> {
-                                                            System.out.println("query(\"INSERT INTO users (name) VALUES ('test')\"): SUCCESS");
+                                                        .compose(res -> {
+                                                            System.out.println("query(\"SAVEPOINT AsyncSqlConnectionPgSavepointWithErrorHandling\"): SUCCESS");
 
                                                             System.out.println("query(\"INSERT INTO users (name) VALUES ('test')\"): START");
                                                             return sqlConnection
@@ -105,9 +105,6 @@ public class ReproduceVerticle extends AbstractVerticle {
                                                                                     System.out.println("query(\"ROLLBACK TO SAVEPOINT AsyncSqlConnectionPgSavepointWithErrorHandling\"): FAIL: " + fail.getMessage());
                                                                                 });
                                                                     });
-                                                        })
-                                                        .onFailure(fail -> {
-                                                            System.out.println("query(\"INSERT INTO users (name) VALUES ('test')\"): FAIL: " + fail.getMessage());
                                                         });
                                             });
                                 })
